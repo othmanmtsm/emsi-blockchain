@@ -7,6 +7,13 @@
 
 #include "hblk_crypto.h"
 
+/**
+ * ec_save - saves an existing EC key pair on the disk
+ * @key: points to the EC key pair to be saved on disk
+ * @folder: path to the folder in which to save the keys
+ *
+ * Return: 1 or 0 upon success or failure
+ */
 int ec_save(EC_KEY *key, char const *folder)
 {
 	char *pub;
@@ -14,33 +21,19 @@ int ec_save(EC_KEY *key, char const *folder)
 	char *sep = "/";
 	FILE *fpub;
 	FILE *fpri;
-	
-	if(!key)
-	{
-		return 0;
-	}	
-	
-	if(opendir(folder))
+
+	if (!key)
+		return (0);
+
+	if (opendir(folder))
 	{
 		fprintf(stderr, "%s", "Directory exists\n");
 	}
-	else if(ENOENT == errno)
+	else if (errno == ENOENT)
 	{
-		fprintf(stderr, "%s", "Directory does not exist\n");
-		if(mkdir(folder, 0777) == -1)
-		{
-			fprintf(stderr, "%s", "Error creating directory\n");
-			return 0;
-		}else
-		{
-			fprintf(stderr, "%s", "Directory created successfuly\n");
-		}
+		if (mkdir(folder, 0777) == -1)
+			return (0);
 	}
-	else
-	{
-		fprintf(stderr, "%s", "opendir() : some other error occured\n");
-	}
-
 	pub = malloc(strlen(folder) + strlen(PUB_FILENAME) + 2);
 	pub = strcpy(pub, folder);
 	strcat(pub, sep);
@@ -49,30 +42,27 @@ int ec_save(EC_KEY *key, char const *folder)
 	pri = strcpy(pri, folder);
 	strcat(pri, sep);
 	strcat(pri, PRI_FILENAME);
-
 	fpub = fopen(pub, "w+");
 	fpri = fopen(pri, "w+");
-	
-	if(PEM_write_EC_PUBKEY(fpub, key) == 0)
+	if (PEM_write_EC_PUBKEY(fpub, key) == 0)
 	{
 		free(pub);
 		free(pri);
 		fclose(fpub);
 		fclose(fpri);
-		return 0;
+		return (0);
 	}
-	if(PEM_write_ECPrivateKey(fpri, key, NULL, NULL, 0, NULL, NULL) == 0)
+	if (PEM_write_ECPrivateKey(fpri, key, NULL, NULL, 0, NULL, NULL) == 0)
 	{
 		free(pub);
 		free(pri);
 		fclose(fpub);
 		fclose(fpri);
-		return 0;
+		return (0);
 	}
-	
 	free(pub);
 	free(pri);
 	fclose(fpub);
 	fclose(fpri);
-	return 1;
+	return (1);
 }

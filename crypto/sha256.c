@@ -4,11 +4,21 @@
 
 #include "hblk_crypto.h"
 
-uint8_t *sha256(int8_t const *s, size_t len, uint8_t digest[SHA256_DIGEST_LENGTH])
+/**
+ * sha256 - compute the hash of a sequence of bytes
+ * @s: the sequence of bytes to be hashed
+ * @len: the number of bytes to hash
+ * @digest: The resulting hash
+ *
+ * Return: pointer to digest, NULL on error
+ */
+
+uint8_t *sha256(int8_t const *s, size_t len,
+		uint8_t digest[SHA256_DIGEST_LENGTH])
 {
-	if(!digest)
+	if (!digest)
 	{
-		return NULL;
+		return (NULL);
 	}
-	return (uint8_t*)SHA256((unsigned char*)s, len, digest);
+	return ((uint8_t *)SHA256((unsigned char *)s, len, digest));
 }
