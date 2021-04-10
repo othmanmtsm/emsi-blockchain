@@ -14,25 +14,26 @@ int main(int ac, char **av)
 	if (ac < 2)
 	{
 		fprintf(stderr, "Usage: %s arg\n", av[0]);
-		return(EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	}
 
 	/* Test `sha256()` */
 	test_ptr = sha256((int8_t *)av[1], strlen(av[1]), hash);
-	if(!test_ptr)
+	if (!test_ptr)
 	{
 		fprintf(stderr, "sha256() failed\n");
-		return(EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	}
-	if(test_ptr != hash)
+	if (test_ptr != hash)
 	{
 		fprintf(stderr, "return value and pointer differ\n");
-		return(EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	}
 
 	printf("\"%s\" hash is : ", av[1]);
 	_print_hex_buffer(hash, SHA256_DIGEST_LENGTH);
 	printf("\n");
 
-	return(EXIT_SUCCESS);
+	return (EXIT_SUCCESS);
 }
+

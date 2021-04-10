@@ -74,3 +74,4 @@ EC_KEY *ec_load(char const *folder)
 	fclose(fpri);
 	return (key);
 }
+

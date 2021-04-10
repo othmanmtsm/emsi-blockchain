@@ -66,3 +66,4 @@ int ec_save(EC_KEY *key, char const *folder)
 	fclose(fpri);
 	return (1);
 }
+

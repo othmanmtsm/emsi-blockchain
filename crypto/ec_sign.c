@@ -28,3 +28,4 @@ uint8_t *ec_sign(EC_KEY const *key, uint8_t const *msg, size_t msglen,
 
 	return (sig->sig);
 }
+
