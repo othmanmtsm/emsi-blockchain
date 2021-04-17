@@ -1,7 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <llist.h>
-
 #include "blockchain.h"
 
 /**
@@ -22,3 +18,4 @@ void blockchain_destroy(blockchain_t *blockchain)
 	}
 	free(blockchain);
 }
+

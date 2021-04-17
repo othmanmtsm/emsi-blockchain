@@ -1,11 +1,81 @@
 #ifndef _BLOCKCHAIN_H_
 #define _BLOCKCHAIN_H_
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <openssl/sha.h>
+#include <time.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 #include <llist.h>
 
+#include "provided/endianness.h"
+#include "../../crypto/hblk_crypto.h"
+
 #define BLOCKCHAIN_DATA_MAX 1024
+
+#define HBLK_MAGIC								\
+	"HBLK"
+
+#define HBLK_MAGIC_LEN								\
+	4
+
+#define HBLK_VERSION								\
+	"0.1"
+
+#define HBLK_VERSION_LEN							\
+	3
+
+#define BLOCK_DATA_MAX_LEN							\
+	1024
+
+#define BLOCK_GENESIS_INIT_INFO_INDEX						\
+	0
+#define BLOCK_GENESIS_INIT_INFO_DIFFICULTY					\
+	0
+#define BLOCK_GENESIS_INIT_INFO_TIMESTAMP					\
+	1537578000
+#define BLOCK_GENESIS_INIT_INFO_NONCE						\
+	0
+#define BLOCK_GENESIS_INIT_INFO_PREV_HASH					\
+	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"	\
+	"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+
+#define BLOCK_GENESIS_INIT_DATA_BUFFER						\
+	"Holberton School"
+#define BLOCK_GENESIS_INIT_DATA_LEN						\
+	16
+#define BLOCK_GENESIS_INIT_DATA							\
+{										\
+	BLOCK_GENESIS_INIT_DATA_BUFFER,						\
+	BLOCK_GENESIS_INIT_DATA_LEN						\
+}
+
+#define BLOCK_GENESIS_INIT_HASH							\
+	"\xc5\x2c\x26\xc8\xb5\x46\x16\x39\x63\x5d\x8e\xdf\x2a\x97\xd4\x8d"	\
+	"\x0c\x8e\x00\x09\xc8\x17\xf2\xb1\xd3\xd7\xff\x2f\x04\x51\x58\x03"
+
+#define BLOCK_GENESIS_INIT							\
+{										\
+	{									\
+		BLOCK_GENESIS_INIT_INFO_INDEX,					\
+		BLOCK_GENESIS_INIT_INFO_DIFFICULTY,				\
+		BLOCK_GENESIS_INIT_INFO_TIMESTAMP,				\
+		BLOCK_GENESIS_INIT_INFO_NONCE,					\
+		BLOCK_GENESIS_INIT_INFO_PREV_HASH				\
+	},									\
+	{									\
+		BLOCK_GENESIS_INIT_DATA_BUFFER,					\
+		BLOCK_GENESIS_INIT_DATA_LEN					\
+	},									\
+	BLOCK_GENESIS_INIT_HASH							\
+}
 
 /**
  * struct block_data_s - Block data
@@ -78,6 +148,7 @@ block_t *block_create(block_t const *prev, int8_t const *data, uint32_t data_len
 void block_destroy(block_t *block);
 void blockchain_destroy(blockchain_t *blockchain);
 uint8_t *block_hash(block_t const *block, uint8_t hash_buf[SHA256_DIGEST_LENGTH]);
+int blockchain_serialize(blockchain_t const *blockchain, char const *path);
 
 #endif
 

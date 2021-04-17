@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <string.h>
-
 #include "blockchain.h"
 
 /**
@@ -42,3 +39,4 @@ blockchain_t *blockchain_create(void)
 	}
 	return (blockchain);
 }
+
