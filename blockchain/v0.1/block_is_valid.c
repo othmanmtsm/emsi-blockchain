@@ -32,3 +32,4 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 		return (1);
 	return (0);
 }
+
