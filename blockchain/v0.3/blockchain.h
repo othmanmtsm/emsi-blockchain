@@ -16,6 +16,7 @@
 
 #include "provided/endianness.h"
 #include "../../crypto/hblk_crypto.h"
+#include "transaction/transaction.h"
 
 #define BLOCKCHAIN_DATA_MAX 1024
 
