@@ -72,6 +72,7 @@ static int foreach_transaction(
 	transaction_t *tx = node;
 	void **args = arg;
 	void *new_args[3];
+
 	new_args[0] = args[0];
 	new_args[1] = args[1];
 	new_args[2] = tx->id;
@@ -95,6 +96,7 @@ llist_t *update_unspent(
 	llist_t *all_unspent)
 {
 	void *args[2];
+
 	args[0] = all_unspent;
 	args[1] = block_hash;
 
