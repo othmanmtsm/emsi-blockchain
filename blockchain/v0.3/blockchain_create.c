@@ -1,11 +1,11 @@
-#include "blockchain.h"
+nclude "blockchain.h"
 
 /**
- * blockchain_create - creates a Blockchain structure, and initializes it.
+ * blockchain_create - allocate and initialize a new blockchain
  *
- * Return: A blockchain_t structure, NULL upon failure
+ * Return: If an error occurs, return NULL.
+ * Otherwise, return a pointer the the new blockchain.
  */
-
 blockchain_t *blockchain_create(void)
 {
 	blockchain_t *blockchain = calloc(1, sizeof(*blockchain));
@@ -18,7 +18,8 @@ blockchain_t *blockchain_create(void)
 		return (NULL);
 	}
 	blockchain->chain = llist_create(MT_SUPPORT_FALSE);
-	if (!blockchain->chain)
+	blockchain->unspent = llist_create(MT_SUPPORT_FALSE);
+	if (!blockchain->chain || !blockchain->unspent)
 	{
 		free(blockchain);
 		free(block);
