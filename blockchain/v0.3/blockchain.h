@@ -91,12 +91,12 @@
  */
 typedef struct block_data_s
 {
-    /*
-     * @buffer must stay first, so we can directly use the structure as
-     * an array of char
-     */
-    int8_t      buffer[BLOCKCHAIN_DATA_MAX];
-    uint32_t    len;
+	/*
+	 * @buffer must stay first, so we can directly use the structure as
+	 * an array of char
+	 */
+	int8_t      buffer[BLOCKCHAIN_DATA_MAX];
+	uint32_t    len;
 } block_data_t;
 
 
@@ -111,18 +111,18 @@ typedef struct block_data_s
  */
 typedef struct block_info_s
 {
-    /*
-     * The order of the elements in this structure should remain the same.
-     * It was designed so every element of this structure is aligned and
-     * doesn't require padding from the compiler.
-     * Therefore, it is possible to use the structure as an array of char,
-     * on any architecture.
-     */
-    uint32_t    index;
-    uint32_t    difficulty;
-    uint64_t    timestamp;
-    uint64_t    nonce;
-    uint8_t     prev_hash[SHA256_DIGEST_LENGTH];
+	/*
+	 * The order of the elements in this structure should remain the same.
+	 * It was designed so every element of this structure is aligned and
+	 * doesn't require padding from the compiler.
+	 * Therefore, it is possible to use the structure as an array of char,
+	 * on any architecture.
+	 */
+	uint32_t    index;
+	uint32_t    difficulty;
+	uint64_t    timestamp;
+	uint64_t    nonce;
+	uint8_t     prev_hash[SHA256_DIGEST_LENGTH];
 } block_info_t;
 
 /**
@@ -134,9 +134,10 @@ typedef struct block_info_s
  */
 typedef struct block_s
 {
-    block_info_t    info; /* This must stay first */
-    block_data_t    data; /* This must stay second */
-    uint8_t     hash[SHA256_DIGEST_LENGTH];
+	block_info_t    info; /* This must stay first */
+	block_data_t    data; /* This must stay second */
+	llist_t	*transactions;
+	uint8_t     hash[SHA256_DIGEST_LENGTH];
 } block_t;
 
 /**
@@ -146,7 +147,8 @@ typedef struct block_s
  */
 typedef struct blockchain_s
 {
-    llist_t     *chain;
+	llist_t     *chain;
+	llist_t	*unspent;
 } blockchain_t;
 
 blockchain_t *blockchain_create(void);

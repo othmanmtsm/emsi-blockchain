@@ -1,4 +1,4 @@
-nclude "blockchain.h"
+#include "blockchain.h"
 
 /**
  * blockchain_create - allocate and initialize a new blockchain
