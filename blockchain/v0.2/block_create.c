@@ -1,5 +1,7 @@
 #include "blockchain.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 /**
  * block_create - Creates a block structure and initializes it
  * @prev: pointer to the previous Block in the Blockchain
@@ -11,15 +13,24 @@
 block_t *block_create(block_t const *prev, int8_t const *data,
 			uint32_t data_len)
 {
-	block_t *block = calloc(1, sizeof(*block));
+	block_t *block = NULL;
 
-	if (!block)
+	if (!prev || !data)
+	{
 		return (NULL);
-	memcpy(&(block->data.buffer), data, MIN(data_len, BLOCKCHAIN_DATA_MAX));
-	block->data.len = MIN(data_len, BLOCKCHAIN_DATA_MAX);
+	}
+	block = calloc(1, sizeof(*block));
+	if (!block)
+	{
+		return (NULL);
+	}
 	block->info.index = prev->info.index + 1;
+	block->info.difficulty = 0;
 	block->info.timestamp = time(NULL);
-	memcpy(&(block->info.prev_hash), prev->hash, SHA256_DIGEST_LENGTH);
+	block->info.nonce = 0;
+	memcpy(block->info.prev_hash, prev->hash, SHA256_DIGEST_LENGTH);
+	block->data.len = MIN(data_len, BLOCK_DATA_MAX_LEN);
+	memcpy(block->data.buffer, data, block->data.len);
 	return (block);
 }
 
