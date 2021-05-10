@@ -1,12 +1,17 @@
 #include "blockchain.h"
 
 /**
- * blockchain_serialize - serializes a Blockchain into a file
+ * blockchain_serialize - serialize a blockchain to a file
  *
- * @blockchain: points to the Blockchain to serialize
- * @path: path to a file to serialize the Blockchain into
- * Return: 0 on success or -1 on failure
+ * @blockchain: pointer to the blockchain to be serialized
+ * @path: path to a file in which to write the serialized blockchain
+ *
+ * Description: If @path points to an existing file, it will be overwritten.
+ *
+ * Return: If an error occurs, return -1.
+ * Otherwise, return 0.
  */
+
 int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 {
 	int fd = -1;
@@ -21,33 +26,29 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 	fd = open(path, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
 	if (fd == -1)
 		return (-1);
-	if (write(fd, HBLK_MAGIC, HBLK_MAGIC_LEN) != HBLK_MAGIC_LEN)
+	if (write(fd, HBLK_MAGIC, strlen(HBLK_MAGIC)) != strlen(HBLK_MAGIC))
 		return (close(fd), -1);
-	if (write(fd, HBLK_VERSION, HBLK_VERSION_LEN) != HBLK_VERSION_LEN)
+	if (write(fd, HBLK_VERSION, strlen(HBLK_VERSION)) != strlen(HBLK_VERSION))
 		return (close(fd), -1);
 	if (write(fd, &endianness, 1) != 1)
 		return (close(fd), -1);
 	if (write(fd, &size, 4) != 4)
 		return (close(fd), -1);
-
-	while (index < size)
+	for (index = 0; index < size; index++)
 	{
-		block = llist_get_node_at(blockchain->chain, index++);
+		block = llist_get_node_at(blockchain->chain, index);
+
 		if (!block)
 			return (close(fd), -1);
-		if (write(fd, &(block->info), sizeof(block->info)) !=
-				sizeof(block->info))
+		if (write(fd, &(block->info), sizeof(block->info)) != sizeof(block->info))
 			return (close(fd), -1);
-		if (write(fd, &(block->data.len), 4) !=
-				4)
+		if (write(fd, &(block->data.len), 4) != 4)
 			return (close(fd), -1);
-		if (write(fd, block->data.buffer, block->data.len) !=
-				block->data.len)
+		if (write(fd, block->data.buffer, block->data.len) != block->data.len)
 			return (close(fd), -1);
 		if (write(fd, block->hash, SHA256_DIGEST_LENGTH) !=
-				SHA256_DIGEST_LENGTH)
+			SHA256_DIGEST_LENGTH)
 			return (close(fd), -1);
 	}
 	return (close(fd), 0);
 }
-
