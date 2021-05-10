@@ -1,24 +1,22 @@
 #ifndef _BLOCKCHAIN_H_
 #define _BLOCKCHAIN_H_
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <llist.h>
 
-#include "provided/endianness.h"
 #include "../../crypto/hblk_crypto.h"
+#include "provided/endianness.h"
 #include "transaction/transaction.h"
-
-#define BLOCKCHAIN_DATA_MAX 1024
 
 #define HBLK_MAGIC								\
 	"HBLK"
@@ -27,7 +25,7 @@
 	4
 
 #define HBLK_VERSION								\
-	"0.1"
+	"0.3"
 
 #define HBLK_VERSION_LEN							\
 	3
@@ -80,34 +78,18 @@
 		BLOCK_GENESIS_INIT_DATA_BUFFER,					\
 		BLOCK_GENESIS_INIT_DATA_LEN					\
 	},									\
+	NULL,									\
 	BLOCK_GENESIS_INIT_HASH							\
 }
 
 /**
- * struct block_data_s - Block data
+ * struct block_info_s - block info
  *
- * @buffer: Data buffer
- * @len:    Data size (in bytes)
- */
-typedef struct block_data_s
-{
-	/*
-	 * @buffer must stay first, so we can directly use the structure as
-	 * an array of char
-	 */
-	int8_t      buffer[BLOCKCHAIN_DATA_MAX];
-	uint32_t    len;
-} block_data_t;
-
-
-/**
- * struct block_info_s - Block info structure
- *
- * @index:      Index of the Block in the Blockchain
- * @difficulty: Difficulty of proof of work (hash leading zero bits)
- * @timestamp:  Time the Block was created at (UNIX timestamp)
- * @nonce:      Salt value used to alter the Block hash
- * @prev_hash:  Hash of the previous Block in the Blockchain
+ * @index: index of the block in the blockchain
+ * @difficulty: difficulty of proof of work (hash leading zero bits)
+ * @timestamp: time the block was created at (UNIX timestamp)
+ * @nonce: salt used to create the block hash
+ * @prev_hash: hash of the previous block in the blockchain
  */
 typedef struct block_info_s
 {
@@ -118,52 +100,81 @@ typedef struct block_info_s
 	 * Therefore, it is possible to use the structure as an array of char,
 	 * on any architecture.
 	 */
-	uint32_t    index;
-	uint32_t    difficulty;
-	uint64_t    timestamp;
-	uint64_t    nonce;
-	uint8_t     prev_hash[SHA256_DIGEST_LENGTH];
+	uint32_t	index;
+	uint32_t	difficulty;
+	uint64_t	timestamp;
+	uint64_t	nonce;
+	uint8_t	prev_hash[SHA256_DIGEST_LENGTH];
 } block_info_t;
 
 /**
- * struct block_s - Block structure
+ * struct block_data_s - block data
  *
- * @info: Block info
- * @data: Block data
+ * @buffer: data buffer
+ * @len: data size (in bytes)
+ */
+typedef struct block_data_s
+{
+	/*
+	 * @buffer must stay first, so we can directly use the structure as
+	 * an array of char
+	 */
+	int8_t	buffer[BLOCK_DATA_MAX_LEN];
+	uint32_t	len;
+} block_data_t;
+
+/**
+ * struct block_s - block
+ *
+ * @info: block info
+ * @data: block data
+ * @transactions: list of transactions
  * @hash: 256-bit digest of the Block, to ensure authenticity
  */
 typedef struct block_s
 {
-	block_info_t    info; /* This must stay first */
-	block_data_t    data; /* This must stay second */
+	block_info_t	info; /* this must stay first */
+	block_data_t	data; /* this must stay second */
 	llist_t	*transactions;
-	uint8_t     hash[SHA256_DIGEST_LENGTH];
+	uint8_t	hash[SHA256_DIGEST_LENGTH];
 } block_t;
 
 /**
- * struct blockchain_s - Blockchain structure
+ * struct blockchain_s - blockchain
  *
- * @chain: Linked list of pointers to block_t
+ * @chain: linked list of pointers to block_t structures
+ * @unspent: linked list of unspent transaction outputs
  */
 typedef struct blockchain_s
 {
-	llist_t     *chain;
+	llist_t	*chain;
 	llist_t	*unspent;
 } blockchain_t;
 
 blockchain_t *blockchain_create(void);
-block_t *block_create(block_t const *prev, int8_t const *data,
-			uint32_t data_len);
+
+block_t *block_create(
+	block_t const *prev, int8_t const *data, uint32_t data_len);
+
 void block_destroy(block_t *block);
+
 void blockchain_destroy(blockchain_t *blockchain);
-uint8_t *block_hash(block_t const *block,
-			uint8_t hash_buf[SHA256_DIGEST_LENGTH]);
+
+uint8_t *block_hash(
+	block_t const *block, uint8_t hash_buf[SHA256_DIGEST_LENGTH]);
+
 int blockchain_serialize(blockchain_t const *blockchain, char const *path);
+
 blockchain_t *blockchain_deserialize(char const *path);
-int block_is_valid(block_t const *block, block_t const *prev_block);
-int hash_matches_difficulty(uint8_t const hash[SHA256_DIGEST_LENGTH], uint32_t difficulty);
+
+int block_is_valid(
+	block_t const *block, block_t const *prev_block, llist_t *all_unspent);
+
+int hash_matches_difficulty(
+	uint8_t const hash[SHA256_DIGEST_LENGTH], uint32_t difficulty);
+
 void block_mine(block_t *block);
+
 uint32_t blockchain_difficulty(blockchain_t const *blockchain);
 
-#endif
-
+#endif /* _BLOCKCHAIN_H_ */
