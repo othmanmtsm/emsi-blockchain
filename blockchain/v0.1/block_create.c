@@ -1,5 +1,7 @@
 #include "blockchain.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 /**
  * block_create - Creates a block structure and initializes it
  * @prev: pointer to the previous Block in the Blockchain
